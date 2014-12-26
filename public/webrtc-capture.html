@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<title>WebRTC Capture Picture</title>
+<style type="text/css">
+</style>
+</head>
+<body>
+    <video></video>
+    <img src="">
+    <canvas style="display:none;" width="640" height="480"></canvas>
+
+
+<script type="text/javascript">
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    window.URL= window.URL || window.webkitURL || window.mozURL || window.msURL;
+
+    if(!navigator.getUserMedia){
+        alert('Native device media streaming (getUserMedia) not supported in this browser.');
+    }else{
+        console.log('Let\'s go to play webRTC~');
+    }
+
+    var video = document.querySelector('video');
+    var img = document.querySelector('img');
+    var canvas = document.querySelector('canvas');
+    var ctx = canvas.getContext('2d');
+
+
+    // video.addEventListener('loadeddata', function(){
+    //     console.log('video loadeddata: ' + video.videoWidth + '*' + video.videoHeight);
+    // })
+
+    function capture () {
+        ctx.drawImage(video, 0, 0);
+        img.src = canvas.toDataURL('image/png');
+    }
+
+    // video.addEventListener('click', capture, false);
+
+
+    navigator.getUserMedia({
+        video: {
+            mandatory: {
+                minWidth: 640,
+                minHeight: 480 
+            }
+        },
+        // audio: true
+    }, successCallback, errorCallback);
+
+    function successCallback(stream){
+        console.log(stream);
+        if(video.mozSrcObject !== undefined){
+            video.mozSrcObject = stream;
+        }else{
+            video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+        }
+
+        video.play();
+
+        video.addEventListener('click', capture, false);
+
+    }
+
+    function errorCallback(err){
+        alert('errorCallback:' + err);
+    }
+
+
+</script>
+</body>
+</html>
